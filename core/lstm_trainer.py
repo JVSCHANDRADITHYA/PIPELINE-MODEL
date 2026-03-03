@@ -1,5 +1,4 @@
 import torch
-import numpy as np
 
 
 def train_autoencoder(model, windows, epochs=20, lr=1e-3):
