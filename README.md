@@ -27,7 +27,7 @@ It operates on streaming multivariate sensor data and produces:
 ---
 
 ## System Architecture
-
+```
 Raw Streaming CSV  
     ↓  
 Sensor Classification  
@@ -45,7 +45,7 @@ Adaptive Thresholding
 Final Decision Engine  
     ↓  
 Structured Logging (+ Optional Dashboard)
-
+```
 ---
 
 ## Data Format
