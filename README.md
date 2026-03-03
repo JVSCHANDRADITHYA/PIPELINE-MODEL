@@ -55,23 +55,23 @@ Input is a streaming CSV structured as:
 Seconds,Timestamp_IST,<sensor_1>,<sensor_2>,...,<sensor_n>
 
 Sensors include:
-
+```
 - Pressure sensors (PI, PIC)
 - Temperature sensors (TI, TIC)
 - Flow sensors (FI, FIC)
 - Operational sensors (MOV, PUMP, SCR, XXI, DRA, SBV, TYPE, MP, etc.)
-
+```
 ---
 
 ## Configuration Parameters
 
 Defined in `core/config.py`:
-
+```
 - DATA_PATH: Path to input CSV
 - COLD_START: Number of samples used for static detection
 - AE_SEQ_LEN: Temporal window length for LSTM
 - PEER_Z: Z-threshold for peer deviation
-
+```
 ---
 
 ## Phase-by-Phase Breakdown
@@ -79,7 +79,7 @@ Defined in `core/config.py`:
 ### 1. Sensor Classification
 
 Sensors are grouped by keyword matching:
-
+```
 MAIN_SENSORS = {
     "P": ["PI", "PIC"],
     "T": ["TI", "TIC"],
@@ -87,16 +87,16 @@ MAIN_SENSORS = {
 }
 
 OP_KEYS = ["MOV", "PUMP", "SCR", "XXI", "DRA", "SBV", "TYPE", "MP"]
-
+```
 Output:
-
+```
 groups = {
     "P": [...],
     "T": [...],
     "F": [...],
     "OP": [...]
 }
-
+```
 ---
 
 ### 2. Cold Start Static Detection
@@ -104,17 +104,12 @@ groups = {
 For the first COLD_START samples:
 
 For each sensor:
-
+```
 std = standard_deviation(first N samples)
 
-If:
-
-std ≈ 0
-
-Sensor is marked:
-
-NON-OPERATIONAL
-
+If std ≈ 0
+    Sensor is marked: NON-OPERATIONAL
+```
 and excluded from PCA and temporal modeling.
 
 Purpose:
@@ -130,18 +125,14 @@ Purpose:
 Within each group (P, T, F):
 
 At time t:
-
+```
 m = median(values)  
 MAD = median(|xi - m|)  
 z_i = |xi - m| / MAD  
 
-If:
-
-z_i > PEER_Z
-
-Sensor is flagged as:
-
-DEVIATING
+If: z_i > PEER_Z :
+    Sensor is flagged as: DEVIATING
+```
 
 This detects:
 
@@ -166,7 +157,7 @@ Flow sensors → PC1_F
 
 At time t:
 
-z(t) = [PC1_P, PC1_T, PC1_F]
+`z(t) = [PC1_P, PC1_T, PC1_F]`
 
 Dimensionality reduces from ~150+ sensors to 3 dominant physical modes.
 
@@ -183,13 +174,9 @@ LSTM learns temporal evolution of:
 
 [PC1_P, PC1_T, PC1_F]
 
-Reconstruction:
+Reconstruction: `recon = model(window)`
 
-recon = model(window)
-
-Reconstruction error:
-
-E(t) = MSE(window, recon)
+Reconstruction error: `E(t) = MSE(window, recon)`
 
 High E(t) indicates deviation from learned dynamics.
 
@@ -222,11 +209,11 @@ Cons:
 - Threshold adapts using EMA
 
 Adaptive threshold:
-
+```
 ema_mean ← running mean of E(t)  
 ema_var ← running variance  
 θ(t) = ema_mean + 3 * sqrt(ema_var)
-
+```
 Pros:
 - Immediate operation
 - No baseline delay
@@ -242,13 +229,11 @@ Cons:
 
 Operational sensors can influence system dynamics.
 
-Operational energy proxy:
-
-O(t) = mean(|operational sensors|)
+Operational energy proxy: `O(t) = mean(|operational sensors|)`
 
 This can be used to:
 
-- Model E(t) ≈ α·O(t) + β
+- Model `E(t) ≈ α·O(t) + β`
 - Create context-aware threshold θ(t)
 
 Helps distinguish:
@@ -268,13 +253,13 @@ Two output formats:
 
 2. Long Format  
    t, sensor, state  
-
+```
 Sensor states:
 
 - HEALTHY
 - NON-OPERATIONAL
 - DEVIATING
-
+```
 ---
 
 ## Performance Notes
