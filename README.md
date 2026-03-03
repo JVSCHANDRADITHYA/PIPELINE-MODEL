@@ -1,10 +1,6 @@
 # Pipeline Multi-Dimensional Anomaly Detection Engine
 
-<div style="display: grid; gap: 10px; align-items: center;">
-    <img src="public/image.png" alt="PIPELINE IMAGE" style="height: 400px; width:800px">
-    <img src="public/faulty.png" alt="FAULTY-SENSORS" style="height: 400px; width:200px">
-</div>
-
+![PIPELINE IMAGE](public/image.png)
 
 ## Overview
 
